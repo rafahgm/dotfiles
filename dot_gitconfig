@@ -1,0 +1,9 @@
+[init]
+	defaultBranch = main
+
+[user]
+	email = rafahgmorais@gmail.com
+	name = Rafael Morais
+
+[includeIf "gitdir:~/Projetos/nitro/"]
+	path = ~/Projetos/nitro/.gitconfig
