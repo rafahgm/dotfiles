@@ -1,0 +1,22 @@
+{
+    "workbench.colorTheme": "Min Darkest Dracula",
+    "workbench.productIconTheme": "fluent-icons",
+    "workbench.iconTheme": "symbols",
+    "workbench.editor.labelFormat": "short",
+    "window.zoomLevel": 0.5,
+    "editor.fontFamily": "Maple Mono NF, Jetbrains Mono, Menlo, Consolas, monospace",
+    "editor.fontLigatures": true,
+    "rust-analyzer.completion.autoimport.enable": false,
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000,
+    "rust-analyzer.check.command": "clippy",
+    "editor.inlayHints.enabled": "offUnlessPressed",
+    "window.titleBarStyle": "native",
+    "window.menuBarVisibility": "hidden",
+    "terminal.integrated.fontFamily": "JetBrainsMono Nerd Font Mono",
+    "editor.gotoLocation.multipleDefinitions": "goto",
+    "editor.wordWrap": "on",
+    "[vue]": {
+        "editor.defaultFormatter": "Vue.volar"
+    }
+}
