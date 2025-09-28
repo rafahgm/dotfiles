@@ -11,6 +11,7 @@ Singleton {
   readonly property string config: StandardPaths.standardLocations(StandardPaths.ConfigLocation)[0]
   readonly property string cache: StandardPaths.standardLocations(StandardPaths.CacheLocation)[0]
 
+  property string coverArt: FileUtils.trimFileProtocol(`${Directories.cache}/media/coverart`)
   property string shellConfig: FileUtils.trimFileProtocol(`${Directories.config}/quickshell`)
   property string shellConfigName: "config.json"
   property string shellConfigPath: `${Directories.shellConfig}/${Directories.shellConfigName}`

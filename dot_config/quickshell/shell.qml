@@ -8,14 +8,17 @@ import Quickshell
 import "./bar"
 import "./osd"
 import "./notifications"
+import "./media"
 import qs.common
 
 ShellRoot {
   property bool enableBar: true
   property bool enableVolumeOSD: true
   property bool enableNotificationPopup: true
-  
+  property bool enableMediaControls: true
+
   LazyLoader {active: enableBar && Config.ready && !Config.options.bar.vertical; component: Bar{}}
   LazyLoader {active: enableVolumeOSD; component: VolumeOSD{}}
   LazyLoader {active: enableNotificationPopup; component: NotificationPopup{}}
+  LazyLoader {active: enableMediaControls; component: MediaControls{}}
 }

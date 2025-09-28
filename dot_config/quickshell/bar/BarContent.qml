@@ -58,6 +58,17 @@ Item {
         spacing: 4
 
         BarGroup {
+            id: leftCenterGroup
+            Layout.preferredWidth: root.centerSideModuleWidth
+            Layout.fillHeight: false
+
+            Media {
+                visible: root.useShortenedForm < 2
+                Layout.fillWidth: true
+            }
+        }
+
+        BarGroup {
             id: middleCenterGroup
             padding: workspacesWidget.widgetPadding
 

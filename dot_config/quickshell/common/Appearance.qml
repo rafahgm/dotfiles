@@ -128,7 +128,8 @@ Singleton {
         property color rippleButtonRipple: ColorUtils.transparentize(ColorUtils.mix(ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency), ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency), 0.85), root.contentTransparency)
         property color rippleButtonToggled: m3colors.m3primary
         property color rippleButtonToggledHover: ColorUtils.mix(m3colors.m3primary, ColorUtils.transparentize(ColorUtils.mix(ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency), ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency), 0.92), root.contentTransparency), 0.87)
-        property color rippleButtonToggledRipple: ColorUtils.mix(m3colors.m3primary, ColorUtils.transparentize(ColorUtils.mix(ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency), colOnLayer1, 0.85), root.contentTransparency), 0.7)
+        property color rippleButtonToggledRipple: ColorUtils.mix(m3colors.m3primary, ColorUtils.transparentize(ColorUtils.mix(ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency), m3colors.m3onSurfaceVariant, 0.85), root.contentTransparency), 0.7)
+        property color darkMode: m3colors.darkmode
 
         property QtObject bar: QtObject {
             property color background: ColorUtils.mix(ColorUtils.transparentize(m3colors.m3background, root.backgroundTransparency), m3colors.m3primary, Config.options.appearance.extraBackgroundTint ? 0.99 : 1)
@@ -157,9 +158,9 @@ Singleton {
             property color separator: m3colors.m3outline
             property color item: m3colors.m3onBackground
             property color menuBackground: ColorUtils.mix(ColorUtils.transparentize(m3colors.m3background, root.backgroundTransparency), m3colors.m3primary, Config.options.appearance.extraBackgroundTint ? 0.99 : 1)
-            property color menuBorder:  ColorUtils.mix(root.m3colors.m3outlineVariant, ColorUtils.mix(ColorUtils.transparentize(m3colors.m3background, root.backgroundTransparency), m3colors.m3primary, Config.options.appearance.extraBackgroundTint ? 0.99 : 1), 0.4)
+            property color menuBorder: ColorUtils.mix(root.m3colors.m3outlineVariant, ColorUtils.mix(ColorUtils.transparentize(m3colors.m3background, root.backgroundTransparency), m3colors.m3primary, Config.options.appearance.extraBackgroundTint ? 0.99 : 1), 0.4)
             property color menuEntry: ColorUtils.mix(ColorUtils.transparentize(m3colors.m3background, root.backgroundTransparency), m3colors.m3primary, Config.options.appearance.extraBackgroundTint ? 0.99 : 1)
-            property color menuSeparator: m3colors.m3outlineVariant 
+            property color menuSeparator: m3colors.m3outlineVariant
         }
 
         property QtObject clock: QtObject {
@@ -181,7 +182,7 @@ Singleton {
             property color background: ColorUtils.transparentize(m3colors.m3surfaceContainerHigh, root.contentTransparency)
             property color backgroundUrgent: ColorUtils.mix(m3colors.m3secondaryContainer, ColorUtils.transparentize(m3colors.m3surfaceContainer, root.contentTransparency), 0.35)
             property color backgroundSingle: ColorUtils.transparentize(m3colors.m3surfaceContainerHigh, root.contentTransparency)
-            property color groupBackground:ColorUtils.transparentize(m3colors.m3surfaceContainer, root.contentTransparency)
+            property color groupBackground: ColorUtils.transparentize(m3colors.m3surfaceContainer, root.contentTransparency)
             property color appName: m3colors.m3outline
             property color time: m3colors.m3outline
             property color expandIcon: m3colors.m3onSurface
@@ -199,6 +200,31 @@ Singleton {
             property color actionHoverUrgent: ColorUtils.mix(m3colors.m3secondaryContainer, m3colors.m3onSecondaryContainer, 0.90)
             property color actionRipple: ColorUtils.transparentize(ColorUtils.mix(ColorUtils.transparentize(m3colors.m3surfaceContainerHighest, root.contentTransparency), m3colors.m3onSurface, 0.80), root.contentTransparency)
             property color actionRippleUrgent: ColorUtils.mix(m3colors.m3secondaryContainer, m3colors.m3onSecondaryContainer, 0.54)
+        }
+
+        property QtObject media: QtObject {
+            property color progress: m3colors.m3onSecondaryContainer
+            property color text: m3colors.m3onSurfaceVariant
+            property color placeholderBackground: ColorUtils.mix(ColorUtils.transparentize(m3colors.m3background, root.backgroundTransparency), m3colors.m3primary, Config.options.appearance.extraBackgroundTint ? 0.99 : 1)
+            property color warningText: m3colors.m3outline
+            property color albumMixFallback: m3colors.m3primary
+            property color albumMix: m3colors.m3primaryContainer
+            property color albumFallback: m3colors.m3secondaryContainer
+
+            property QtObject blendedColors: QtObject {
+                property color colLayer0: ColorUtils.mix(ColorUtils.transparentize(m3colors.m3background, root.backgroundTransparency), m3colors.m3primary, Config.options.appearance.extraBackgroundTint ? 0.99 : 1)
+                property color colOnLayer0: m3colors.m3onBackground
+                property color colLayer1: ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency)
+                property color colOnLayer1: m3colors.m3onSurfaceVariant
+                property color colPrimary: m3colors.m3primary
+                property color colPrimaryHover: ColorUtils.mix(m3colors.m3primary, ColorUtils.transparentize(ColorUtils.mix(ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency), m3colors.m3onSurfaceVariant, 0.92), root.contentTransparency), 0.87)
+                property color colPrimaryActive: ColorUtils.mix(m3colors.m3primary, ColorUtils.transparentize(ColorUtils.mix(ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency), m3colors.m3onSurfaceVariant, 0.85), root.contentTransparency), 0.7)
+                property color colSecondaryContainer: m3colors.m3secondaryContainer
+                property color colSecondaryContainerHover: ColorUtils.mix(m3colors.m3secondaryContainer, m3colors.m3onSecondaryContainer, 0.90)
+                property color colSecondaryContainerActive: ColorUtils.mix(m3colors.m3secondaryContainer, m3colors.m3onSecondaryContainer, 0.54)
+                property color colOnPrimary: m3colors.m3onPrimary
+                property color colOnSecondaryContainer: m3colors.m3onSecondaryContainer
+            }
         }
     }
 

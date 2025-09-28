@@ -24,8 +24,8 @@ Item {
     property int widgetPadding: 4
     property int workspaceButtonWidth: 26
     property real activeWorkspaceMargin: 2
-    property real workspaceIconSize: workspaceButtonWidth * 0.69
-    property real workspaceIconSizeShrinked: workspaceButtonWidth * 0.55
+    property real workspaceIconSize: workspaceButtonWidth * 0.59
+    property real workspaceIconSizeShrinked: workspaceButtonWidth * 0.50
     property real workspaceIconOpacityShrinked: 1
     property real workspaceIconMarginShrinked: -4
     property int workspaceIndexInGroup: (monitor?.activeWorkspace?.id - 1) % Config.options.bar.workspaces.shown
