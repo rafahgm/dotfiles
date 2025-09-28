@@ -1,0 +1,19 @@
+font-family = JetBrainsMono Nerd Font Mono
+font-size = 14
+
+cursor-style = block
+cursor-style-blink = true
+mouse-hide-while-typing = true
+
+link-previews = true
+
+window-padding-x = 10
+window-padding-y = 10
+window-padding-balance = true
+window-decoration = none
+
+shell-integration = zsh
+shell-integration-features = cursor,sudo,title,ssh-env,ssh-terminfo
+
+
+quit-after-last-window-closed = false

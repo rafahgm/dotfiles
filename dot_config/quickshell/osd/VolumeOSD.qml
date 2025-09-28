@@ -1,3 +1,7 @@
+import qs
+import qs.services
+import qs.common
+import qs.common.widgets
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -5,19 +9,15 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Hyprland
-import qs
-import qs.services
-import qs.common
-import qs.common.widgets
 
 Scope {
     id: root
     property string protectionMessage: ""
-    property var focusedScreen: Quickshell.screens.find(s => s.name == Hyprland.focusedMonitor?.name)
+    property var focusedScreen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name)
 
     function triggerOsd() {
-        GlobalStates.osdVolumeOpen = true;
-        osdTimeout.restart();
+        GlobalStates.osdVolumeOpen = true
+        osdTimeout.restart()
     }
 
     Timer {
@@ -26,31 +26,28 @@ Scope {
         repeat: false
         running: false
         onTriggered: {
-            GlobalStates.osdVolumeOpen = false;
-            root.protectionMessage = "";
+            GlobalStates.osdVolumeOpen = false
+            root.protectionMessage = ""
         }
     }
 
-    Connections {
+    Connections { // Listen to volume changes
         target: Audio.sink?.audio ?? null
         function onVolumeChanged() {
-            if (!Audio.ready)
-                return;
-            root.triggerOsd();
+            if (!Audio.ready) return
+            root.triggerOsd()
         }
-
         function onMutedChanged() {
-            if (!Audio.ready)
-                return;
-            root.triggerOsd();
+            if (!Audio.ready) return
+            root.triggerOsd()
         }
     }
 
-    Connections {
+    Connections { // Listen to protection triggers
         target: Audio
         function onSinkProtectionTriggered(reason) {
             root.protectionMessage = reason;
-            root.triggerOsd();
+            root.triggerOsd()
         }
     }
 
@@ -62,14 +59,19 @@ Scope {
             id: osdRoot
             color: "transparent"
 
-            WlrLayershell.namespace: "quickshell:OSD"
-            WlrLayershell.layer: WlrLayer.Overlay
+            Connections {
+                target: root
+                function onFocusedScreenChanged() {
+                    osdRoot.screen = root.focusedScreen
+                }
+            }
 
+            WlrLayershell.namespace: "quickshell:onScreenDisplay"
+            WlrLayershell.layer: WlrLayer.Overlay
             anchors {
                 top: !Config.options.bar.bottom
                 bottom: Config.options.bar.bottom
             }
-
             mask: Region {
                 item: osdValuesWrapper
             }
@@ -90,8 +92,9 @@ Scope {
                 anchors.horizontalCenter: parent.horizontalCenter
                 Item {
                     id: osdValuesWrapper
-                    implicitWidth: contentColumnLayout.implicitWidth
+                    // Extra space for shadow
                     implicitHeight: contentColumnLayout.implicitHeight + Appearance.sizes.elevationMargin * 2
+                    implicitWidth: contentColumnLayout.implicitWidth
                     clip: true
 
                     MouseArea {
@@ -106,10 +109,9 @@ Scope {
                             top: parent.top
                             left: parent.left
                             right: parent.right
-                            rightMargin: Appearance.sizes.elevationMargin
                             leftMargin: Appearance.sizes.elevationMargin
+                            rightMargin: Appearance.sizes.elevationMargin
                         }
-
                         spacing: 0
 
                         OSDValueIndicator {
@@ -130,15 +132,14 @@ Scope {
                             StyledRectangularShadow {
                                 target: protectionMessageBackground
                             }
-
                             Rectangle {
                                 id: protectionMessageBackground
                                 anchors.centerIn: parent
-                                color: "teal"
+                                color: Appearance.m3colors.m3error
                                 property real padding: 10
                                 implicitHeight: protectionMessageRowLayout.implicitHeight + padding * 2
                                 implicitWidth: protectionMessageRowLayout.implicitWidth + padding * 2
-                                radius: Appearance.rounding.md
+                                radius: Appearance.rounding.normal
 
                                 RowLayout {
                                     id: protectionMessageRowLayout
@@ -146,14 +147,13 @@ Scope {
                                     MaterialSymbol {
                                         id: protectionMessageIcon
                                         text: "dangerous"
-                                        iconSize: Appearance.font.pixelSize.xxxl
-                                        color: "yellow"
+                                        iconSize: Appearance.font.pixelSize.hugeass
+                                        color: Appearance.m3colors.m3onError
                                     }
-
                                     StyledText {
                                         id: protectionMessageTextWidget
                                         horizontalAlignment: Text.AlignHCenter
-                                        color: "yellow"
+                                        color: Appearance.m3colors.m3onError
                                         wrapMode: Text.Wrap
                                         text: root.protectionMessage
                                     }
@@ -165,4 +165,37 @@ Scope {
             }
         }
     }
+
+    IpcHandler {
+		target: "osdVolume"
+
+		function trigger() {
+            root.triggerOsd()
+        }
+
+        function hide() {
+            GlobalStates.osdVolumeOpen = false
+        }
+
+        function toggle() {
+            GlobalStates.osdVolumeOpen = !GlobalStates.osdVolumeOpen
+        }
+	}
+    GlobalShortcut {
+        name: "osdVolumeTrigger"
+        description: "Triggers volume OSD on press"
+
+        onPressed: {
+            root.triggerOsd()
+        }
+    }
+    GlobalShortcut {
+        name: "osdVolumeHide"
+        description: "Hides volume OSD on press"
+
+        onPressed: {
+            GlobalStates.osdVolumeOpen = false
+        }
+    }
+
 }

@@ -6,25 +6,213 @@ import qs.common.utils
 
 Singleton {
     id: root
-    property QtObject palette
-    property QtObject colors
+    property QtObject m3colors
     property QtObject animation
     property QtObject animationCurves
+    property QtObject colors
     property QtObject rounding
     property QtObject font
     property QtObject sizes
+    property string syntaxHighlightingTheme
+
+    // Transparency. The quadratic functions were derived from analysis of hand-picked transparency values.
+    ColorQuantizer {
+        id: wallColorQuant
+        source: Qt.resolvedUrl(Config.options.background.wallpaperPath)
+        depth: 0 // 2^0 = 1 color
+        rescaleSize: 10
+    }
+    property real wallpaperVibrancy: (wallColorQuant.colors[0]?.hslSaturation + wallColorQuant.colors[0]?.hslLightness) / 2
+    property real autoBackgroundTransparency: {
+        // y = 0.5768x^2 - 0.759x + 0.2896
+        let x = wallpaperVibrancy;
+        let y = 0.5768 * (x * x) - 0.759 * (x) + 0.2896;
+        return Math.max(0, Math.min(0.22, y));
+    }
+    property real autoContentTransparency: {
+        // y = -10.1734x^2 + 3.4457x + 0.1872
+        let x = autoBackgroundTransparency;
+        let y = -10.1734 * (x * x) + 3.4457 * (x) + 0.1872;
+        return Math.max(0, Math.min(0.6, y));
+    }
+    property real backgroundTransparency: Config?.options.appearance.transparency.enable ? Config?.options.appearance.transparency.automatic ? autoBackgroundTransparency : Config?.options.appearance.transparency.backgroundTransparency : 0
+    property real contentTransparency: Config?.options.appearance.transparency.enable ? Config?.options.appearance.transparency.automatic ? autoContentTransparency : Config?.options.appearance.transparency.contentTransparency : 0
+
+    m3colors: QtObject {
+        property bool darkmode: false
+        property bool transparent: false
+        property color m3primary_paletteKeyColor: "#91689E"
+        property color m3secondary_paletteKeyColor: "#837186"
+        property color m3tertiary_paletteKeyColor: "#9D6A67"
+        property color m3neutral_paletteKeyColor: "#7C757B"
+        property color m3neutral_variant_paletteKeyColor: "#7D747D"
+        property color m3background: "#161217"
+        property color m3onBackground: "#EAE0E7"
+        property color m3surface: "#161217"
+        property color m3surfaceDim: "#161217"
+        property color m3surfaceBright: "#3D373D"
+        property color m3surfaceContainerLowest: "#110D12"
+        property color m3surfaceContainerLow: "#1F1A1F"
+        property color m3surfaceContainer: "#231E23"
+        property color m3surfaceContainerHigh: "#2D282E"
+        property color m3surfaceContainerHighest: "#383339"
+        property color m3onSurface: "#EAE0E7"
+        property color m3surfaceVariant: "#4C444D"
+        property color m3onSurfaceVariant: "#CFC3CD"
+        property color m3inverseSurface: "#EAE0E7"
+        property color m3inverseOnSurface: "#342F34"
+        property color m3outline: "#988E97"
+        property color m3outlineVariant: "#4C444D"
+        property color m3shadow: "#000000"
+        property color m3scrim: "#000000"
+        property color m3surfaceTint: "#E5B6F2"
+        property color m3primary: "#E5B6F2"
+        property color m3onPrimary: "#452152"
+        property color m3primaryContainer: "#5D386A"
+        property color m3onPrimaryContainer: "#F9D8FF"
+        property color m3inversePrimary: "#775084"
+        property color m3secondary: "#D5C0D7"
+        property color m3onSecondary: "#392C3D"
+        property color m3secondaryContainer: "#534457"
+        property color m3onSecondaryContainer: "#F2DCF3"
+        property color m3tertiary: "#F5B7B3"
+        property color m3onTertiary: "#4C2523"
+        property color m3tertiaryContainer: "#BA837F"
+        property color m3onTertiaryContainer: "#000000"
+        property color m3error: "#FFB4AB"
+        property color m3onError: "#690005"
+        property color m3errorContainer: "#93000A"
+        property color m3onErrorContainer: "#FFDAD6"
+        property color m3primaryFixed: "#F9D8FF"
+        property color m3primaryFixedDim: "#E5B6F2"
+        property color m3onPrimaryFixed: "#2E0A3C"
+        property color m3onPrimaryFixedVariant: "#5D386A"
+        property color m3secondaryFixed: "#F2DCF3"
+        property color m3secondaryFixedDim: "#D5C0D7"
+        property color m3onSecondaryFixed: "#241727"
+        property color m3onSecondaryFixedVariant: "#514254"
+        property color m3tertiaryFixed: "#FFDAD7"
+        property color m3tertiaryFixedDim: "#F5B7B3"
+        property color m3onTertiaryFixed: "#331110"
+        property color m3onTertiaryFixedVariant: "#663B39"
+        property color m3success: "#B5CCBA"
+        property color m3onSuccess: "#213528"
+        property color m3successContainer: "#374B3E"
+        property color m3onSuccessContainer: "#D1E9D6"
+        property color term0: "#EDE4E4"
+        property color term1: "#B52755"
+        property color term2: "#A97363"
+        property color term3: "#AF535D"
+        property color term4: "#A67F7C"
+        property color term5: "#B2416B"
+        property color term6: "#8D76AD"
+        property color term7: "#272022"
+        property color term8: "#0E0D0D"
+        property color term9: "#B52755"
+        property color term10: "#A97363"
+        property color term11: "#AF535D"
+        property color term12: "#A67F7C"
+        property color term13: "#B2416B"
+        property color term14: "#8D76AD"
+        property color term15: "#221A1A"
+    }
+
+    colors: QtObject {
+        property color text: m3colors.m3onBackground
+        property color link: m3colors.m3primary
+        property color scrollbar: m3colors.m3onSurfaceVariant
+        property color radioChecked: m3colors.m3primary
+        property color radioUnchecked: m3colors.m3onSurfaceVariant
+        property color rippleButton: ColorUtils.transparentize(ColorUtils.mix(ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency), ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency), 0.92), 1)
+        property color rippleButtonHover: ColorUtils.transparentize(ColorUtils.mix(ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency), ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency), 0.92), root.contentTransparency)
+        property color rippleButtonRipple: ColorUtils.transparentize(ColorUtils.mix(ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency), ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency), 0.85), root.contentTransparency)
+        property color rippleButtonToggled: m3colors.m3primary
+        property color rippleButtonToggledHover: ColorUtils.mix(m3colors.m3primary, ColorUtils.transparentize(ColorUtils.mix(ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency), ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency), 0.92), root.contentTransparency), 0.87)
+        property color rippleButtonToggledRipple: ColorUtils.mix(m3colors.m3primary, ColorUtils.transparentize(ColorUtils.mix(ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency), colOnLayer1, 0.85), root.contentTransparency), 0.7)
+
+        property QtObject bar: QtObject {
+            property color background: ColorUtils.mix(ColorUtils.transparentize(m3colors.m3background, root.backgroundTransparency), m3colors.m3primary, Config.options.appearance.extraBackgroundTint ? 0.99 : 1)
+            property color border: ColorUtils.mix(root.m3colors.m3outlineVariant, ColorUtils.mix(ColorUtils.transparentize(m3colors.m3background, root.backgroundTransparency), m3colors.m3primary, Config.options.appearance.extraBackgroundTint ? 0.99 : 1), 0.4)
+            property color groupBackground: ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency)
+            property color separator: m3colors.m3outlineVariant
+        }
+
+        property QtObject workspaces: QtObject {
+            property color background: m3colors.m3secondaryContainer
+            property color active: m3colors.m3primary
+            property color textActive: m3colors.m3primary
+            property color textOccupied: m3colors.m3onSecondaryContainer
+            property color textInactive: ColorUtils.mix(m3colors.m3onSurfaceVariant, ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency), 0.45)
+            property color dotActive: m3colors.m3primary
+            property color dotOccupied: m3colors.m3onSecondaryContainer
+            property color dotInactive: ColorUtils.mix(m3colors.m3onSurfaceVariant, ColorUtils.transparentize(m3colors.m3surfaceContainerLow, root.contentTransparency), 0.45)
+        }
+
+        property QtObject systray: QtObject {
+            property color expand: m3colors.m3secondaryContainer
+            property color expandHover: ColorUtils.mix(m3colors.m3secondaryContainer, m3colors.m3onSecondaryContainer, 0.90)
+            property color expandRipple: ColorUtils.mix(m3colors.m3secondaryContainer, m3colors.m3onSecondaryContainer, 0.54)
+            property color expandIcon: m3colors.m3onSurface
+            property color expandIconOpen: m3colors.m3onSecondaryContainer
+            property color separator: m3colors.m3outline
+            property color item: m3colors.m3onBackground
+            property color menuBackground: ColorUtils.mix(ColorUtils.transparentize(m3colors.m3background, root.backgroundTransparency), m3colors.m3primary, Config.options.appearance.extraBackgroundTint ? 0.99 : 1)
+            property color menuBorder:  ColorUtils.mix(root.m3colors.m3outlineVariant, ColorUtils.mix(ColorUtils.transparentize(m3colors.m3background, root.backgroundTransparency), m3colors.m3primary, Config.options.appearance.extraBackgroundTint ? 0.99 : 1), 0.4)
+            property color menuEntry: ColorUtils.mix(ColorUtils.transparentize(m3colors.m3background, root.backgroundTransparency), m3colors.m3primary, Config.options.appearance.extraBackgroundTint ? 0.99 : 1)
+            property color menuSeparator: m3colors.m3outlineVariant 
+        }
+
+        property QtObject clock: QtObject {
+            property color text: m3colors.m3onSurfaceVariant
+            property color tooltip: m3colors.m3onSurfaceVariant
+        }
+
+        property QtObject popups: QtObject {
+            property color background: ColorUtils.transparentize(m3colors.m3surfaceContainer, root.contentTransparency)
+            property color border: ColorUtils.mix(root.m3colors.m3outlineVariant, ColorUtils.mix(ColorUtils.transparentize(m3colors.m3background, root.backgroundTransparency), m3colors.m3primary, Config.options.appearance.extraBackgroundTint ? 0.99 : 1), 0.4)
+        }
+
+        property QtObject osd: QtObject {
+            property color background: ColorUtils.mix(ColorUtils.transparentize(m3colors.m3background, root.backgroundTransparency), m3colors.m3primary, Config.options.appearance.extraBackgroundTint ? 0.99 : 1)
+            property color text: m3colors.m3onBackground
+        }
+
+        property QtObject notifications: QtObject {
+            property color background: ColorUtils.transparentize(m3colors.m3surfaceContainerHigh, root.contentTransparency)
+            property color backgroundUrgent: ColorUtils.mix(m3colors.m3secondaryContainer, ColorUtils.transparentize(m3colors.m3surfaceContainer, root.contentTransparency), 0.35)
+            property color backgroundSingle: ColorUtils.transparentize(m3colors.m3surfaceContainerHigh, root.contentTransparency)
+            property color groupBackground:ColorUtils.transparentize(m3colors.m3surfaceContainer, root.contentTransparency)
+            property color appName: m3colors.m3outline
+            property color time: m3colors.m3outline
+            property color expandIcon: m3colors.m3onSurface
+            property color expandIconBackground: ColorUtils.mix(ColorUtils.transparentize(m3colors.m3surfaceContainer, root.contentTransparency), ColorUtils.transparentize(ColorUtils.mix(ColorUtils.transparentize(m3colors.m3surfaceContainer, root.contentTransparency), m3colors.m3onSurface, 0.90), root.contentTransparency), 0.5)
+            property color expandIconHover: ColorUtils.transparentize(ColorUtils.mix(ColorUtils.transparentize(m3colors.m3surfaceContainer, root.contentTransparency), m3colors.m3onSurface, 0.90), root.contentTransparency)
+            property color expandIconRipple: ColorUtils.transparentize(ColorUtils.mix(ColorUtils.transparentize(m3colors.m3surfaceContainer, root.contentTransparency), m3colors.m3onSurface, 0.80), root.contentTransparency)
+            property color iconBackground: m3colors.m3secondaryContainer
+            property color icon: m3colors.m3onSecondaryContainer
+            property color iconUrgent: ColorUtils.mix(m3colors.m3onSecondary, m3colors.m3onSecondaryContainer, 0.1)
+            property color summary: m3colors.m3onSurface
+            property color body: m3colors.m3outline
+            property color action: ColorUtils.transparentize(m3colors.m3surfaceContainerHighest, root.contentTransparency)
+            property color actionUrgent: m3colors.m3secondaryContainer
+            property color actionHover: ColorUtils.transparentize(ColorUtils.mix(ColorUtils.transparentize(m3colors.m3surfaceContainerHighest, root.contentTransparency), m3colors.m3onSurface, 0.90), root.contentTransparency)
+            property color actionHoverUrgent: ColorUtils.mix(m3colors.m3secondaryContainer, m3colors.m3onSecondaryContainer, 0.90)
+            property color actionRipple: ColorUtils.transparentize(ColorUtils.mix(ColorUtils.transparentize(m3colors.m3surfaceContainerHighest, root.contentTransparency), m3colors.m3onSurface, 0.80), root.contentTransparency)
+            property color actionRippleUrgent: ColorUtils.mix(m3colors.m3secondaryContainer, m3colors.m3onSecondaryContainer, 0.54)
+        }
+    }
 
     rounding: QtObject {
         property int unsharpen: 2
         property int unsharpenmore: 6
-        property int xs: 8
-        property int sm: 12
-        property int md: 17
-        property int lg: 23
-        property int xl: 30
-        property int full: 999
-        property int screenRounding: lg
-        property int windowRounding: md
+        property int verysmall: 8
+        property int small: 12
+        property int normal: 17
+        property int large: 23
+        property int verylarge: 30
+        property int full: 9999
+        property int screenRounding: large
+        property int windowRounding: 18
     }
 
     font: QtObject {
@@ -37,18 +225,17 @@ Singleton {
             property string reading: "Readex Pro"
             property string expressive: "Space Grotesk"
         }
-
         property QtObject pixelSize: QtObject {
-            property int xxxs: 10
-            property int xxs: 12
-            property int xs: 13
-            property int sm: 15
-            property int md: 16
-            property int lg: 17
-            property int xl: 19
-            property int xxl: 22
-            property int xxxl: 23
-            property int title: xxl
+            property int smallest: 10
+            property int smaller: 12
+            property int smallie: 13
+            property int small: 15
+            property int normal: 16
+            property int large: 17
+            property int larger: 19
+            property int huge: 22
+            property int hugeass: 23
+            property int title: huge
         }
     }
 
@@ -73,9 +260,9 @@ Singleton {
 
     animation: QtObject {
         property QtObject elementMove: QtObject {
-            property int duration: root.animationCurves.expressiveDefaultSpatialDuration
+            property int duration: animationCurves.expressiveDefaultSpatialDuration
             property int type: Easing.BezierSpline
-            property list<real> bezierCurve: root.animationCurves.expressiveDefaultSpatial
+            property list<real> bezierCurve: animationCurves.expressiveDefaultSpatial
             property int velocity: 650
             property Component numberAnimation: Component {
                 NumberAnimation {
@@ -103,7 +290,7 @@ Singleton {
         property QtObject elementMoveExit: QtObject {
             property int duration: 200
             property int type: Easing.BezierSpline
-            property list<real> bezierCurve: root.animationCurves.emphasizedAccel
+            property list<real> bezierCurve: animationCurves.emphasizedAccel
             property int velocity: 650
             property Component numberAnimation: Component {
                 NumberAnimation {
@@ -138,7 +325,7 @@ Singleton {
         property QtObject elementResize: QtObject {
             property int duration: 400
             property int type: Easing.BezierSpline
-            property list<real> bezierCurve: root.animationCurves.emphasized
+            property list<real> bezierCurve: animationCurves.emphasized
             property int velocity: 650
             property Component numberAnimation: Component {
                 NumberAnimation {
@@ -166,7 +353,7 @@ Singleton {
         property QtObject scroll: QtObject {
             property int duration: 200
             property int type: Easing.BezierSpline
-            property list<real> bezierCurve: root.animationCurves.standardDecel
+            property list<real> bezierCurve: animationCurves.standardDecel
         }
 
         property QtObject menuDecel: QtObject {
@@ -177,8 +364,6 @@ Singleton {
 
     sizes: QtObject {
         property real baseBarHeight: 40
-        property real baseBarYPadding: 5
-        property real baseBarXPadding: 5
         property real barHeight: Config.options.bar.cornerStyle === 1 ? (baseBarHeight + root.sizes.hyprlandGapsOut * 2) : baseBarHeight
         property real barCenterSideModuleWidth: Config.options?.bar.verbose ? 360 : 140
         property real barCenterSideModuleWidthShortened: 280
@@ -188,7 +373,7 @@ Singleton {
         property real elevationMargin: 10
         property real fabShadowRadius: 5
         property real fabHoveredShadowRadius: 7
-        property real hyprlandGapsOut: 10
+        property real hyprlandGapsOut: 5
         property real mediaControlsWidth: 440
         property real mediaControlsHeight: 160
         property real notificationPopupWidth: 410
@@ -205,51 +390,5 @@ Singleton {
         property real wallpaperSelectorItemPadding: 6
     }
 
-    palette: QtObject {
-        property string crust: "#11111B"
-        property string mantle: "#181825"
-        property string base: "#1E1E2E"
-        property string surface0: "#313244"
-        property string surface1: "#45475A"
-        property string overlay0: "#6C7086"
-        property string overlay1: "#7F849C"
-        property string overlay2: "#9399B2"
-        property string subtext0: "#A6ADC8"
-        property string subtext1: "#BAC2DE"
-        property string text: "#CDD6F4"
-        property string rosewater: "#F5E0DC"
-        property string flamingo: "#F2CDCD"
-        property string pink: "#F5C2E7"
-        property string mauve: "#CBA6F7"
-        property string red: "#F38BA8"
-        property string maroon: "#EBA0AC"
-        property string peach: "#FAB387"
-        property string yellow: "#F9E2AF"
-        property string green: "#A6E3A1"
-        property string teal: "#94E2D5"
-        property string sky: "#89DCEB"
-        property string sapphire: "#74C7EC"
-        property string blue: "#89B4FA"
-        property string lavender: "#B4BEFE"
-    }
-
-    colors: QtObject {
-        property string barBackground: palette.surface0
-        property string clockText: palette.text
-        property string workspacesBackground: palette.overlay0
-        property string activeWorkspaceBackground: palette.mauve
-        property string linkColor: palette.peach
-
-        property QtObject systray: QtObject {
-            property string separator: palette.text
-        }
-
-        property QtObject osd: QtObject {
-            property string background: palette.surface0
-            property string icon: palette.text
-            property string text: palette.text
-            property string track: palette.text
-            property string highlight: palette.mauve
-        }
-    }
+    syntaxHighlightingTheme: root.m3colors.darkmode ? "Monokai" : "ayu Light"
 }

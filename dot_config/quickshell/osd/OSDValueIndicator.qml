@@ -1,11 +1,13 @@
-import QtQuick
-import QtQuick.Layouts
-import QtQuick.Controls
-import QtQuick.Effects
-import Quickshell
-import Quickshell.Widgets
+import qs.services
 import qs.common
 import qs.common.widgets
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Effects
+import QtQuick.Layouts
+import Quickshell
+import Quickshell.Widgets
+// import Qt5Compat.GraphicalEffects
 
 Item {
     id: root
@@ -17,7 +19,7 @@ Item {
 
     property real valueIndicatorVerticalPadding: 9
     property real valueIndicatorLeftPadding: 10
-    property real valueIndicatorRightPadding: 20
+    property real valueIndicatorRightPadding: 20 // An icon is circle ish, a column isn't, hence the extra padding
 
     Layout.margins: Appearance.sizes.elevationMargin
     implicitWidth: Appearance.sizes.osdWidth
@@ -26,7 +28,6 @@ Item {
     StyledRectangularShadow {
         target: valueIndicator
     }
-
     WrapperRectangle {
         id: valueIndicator
         anchors.fill: parent
@@ -34,7 +35,7 @@ Item {
         color: Appearance.colors.osd.background
         implicitWidth: valueRow.implicitWidth
 
-        RowLayout {
+        RowLayout { // Icon on the left, stuff on the right
             id: valueRow
             Layout.margins: 10
             anchors.fill: parent
@@ -47,15 +48,14 @@ Item {
                 Layout.leftMargin: valueIndicatorLeftPadding
                 Layout.topMargin: valueIndicatorVerticalPadding
                 Layout.bottomMargin: valueIndicatorVerticalPadding
-
-                MaterialSymbol {
+                MaterialSymbol { // Icon
                     anchors {
                         centerIn: parent
                         alignWhenCentered: !root.rotateIcon
                     }
-
-                    color: Appearance.colors.osd.icon
+                    color: Appearance.colors.osd.text
                     renderType: Text.QtRendering
+
                     text: root.icon
                     iconSize: 20 + 10 * (root.scaleIcon ? value : 1)
                     rotation: 180 * (root.rotateIcon ? value : 0)
@@ -66,39 +66,37 @@ Item {
                     Behavior on rotation {
                         animation: Appearance.animation.elementMoveEnter.numberAnimation.createObject(this)
                     }
+                
                 }
             }
-
-            ColumnLayout {
+            ColumnLayout { // Stuff
                 Layout.alignment: Qt.AlignVCenter
                 Layout.rightMargin: valueIndicatorRightPadding
                 spacing: 5
 
-                RowLayout {
-                    Layout.leftMargin: valueProgressBar.height / 2
-                    Layout.rightMargin: valueProgressBar.height / 2
+                RowLayout { // Name fill left, value on the right end
+                    Layout.leftMargin: valueProgressBar.height / 2 // Align text with progressbar radius curve's left end
+                    Layout.rightMargin: valueProgressBar.height / 2 // Align text with progressbar radius curve's left end
 
                     StyledText {
                         color: Appearance.colors.osd.text
-                        font.pixelSize: Appearance.font.pixelSize.sm
+                        font.pixelSize: Appearance.font.pixelSize.small
                         Layout.fillWidth: true
                         text: root.name
                     }
 
                     StyledText {
                         color: Appearance.colors.osd.text
-                        font.pixelSize: Appearance.font.pixelSize.sm
+                        font.pixelSize: Appearance.font.pixelSize.small
                         Layout.fillWidth: false
                         text: Math.round(root.value * 100)
                     }
                 }
-
+                
                 StyledProgressBar {
                     id: valueProgressBar
                     Layout.fillWidth: true
                     value: root.value
-                    trackColor: Appearance.colors.osd.track
-                    highlightColor: Appearance.colors.osd.highlight
                 }
             }
         }

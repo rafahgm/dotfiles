@@ -1,11 +1,10 @@
+import qs.common
+import qs.common.widgets
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Services.SystemTray
-import qs.common.widgets
-import qs.bar
-import qs.common
 
 Item {
     id: root
@@ -14,8 +13,8 @@ Item {
     property bool vertical: false
     property bool invertSide: false
     property bool trayOverflowOpen: false
+    property bool showSeparator: true
     property bool showOverflowMenu: true
-	property bool showSeparator: true
     property var activeMenu: null
 
     property list<var> itemsInUserList: SystemTray.items.values.filter(i => (Config.options.bar.tray.pinnedItems.includes(i.id) && i.status !== Status.Passive))
@@ -23,23 +22,21 @@ Item {
     property bool invertPins: Config.options.bar.tray.invertPinnedItems
     property list<var> pinnedItems: invertPins ? itemsNotInUserList : itemsInUserList
     property list<var> unpinnedItems: invertPins ? itemsInUserList : itemsNotInUserList
-
     onUnpinnedItemsChanged: {
-        if (unpinnedItems.length === 0)
-            root.closeOverflowMenu();
+        if (unpinnedItems.length == 0) root.closeOverflowMenu();
     }
 
     function grabFocus() {
         focusGrab.active = true;
     }
 
-    function releaseFocus() {
-        focusGrab.active = false;
-    }
-
     function setExtraWindowAndGrabFocus(window) {
         root.activeMenu = window;
         root.grabFocus();
+    }
+
+    function releaseFocus() {
+        focusGrab.active = false;
     }
 
     function closeOverflowMenu() {
@@ -65,94 +62,94 @@ Item {
         }
     }
 
-	GridLayout {
-		id: gridLayout
-		columns: root.vertical ? 1 : -1
-		anchors.fill: parent
-		rowSpacing: 8
-		columnSpacing: 15
+    GridLayout {
+        id: gridLayout
+        columns: root.vertical ? 1 : -1
+        anchors.fill: parent
+        rowSpacing: 8
+        columnSpacing: 15
 
-		RippleButton {
-			id: trayOverflowButton
-			visible: root.showOverflowMenu && root.unpinnedItems.length > 0
-			toggled: root.trayOverflowOpen
-			property bool containsMouse: hovered
+        RippleButton {
+            id: trayOverflowButton
+            visible: root.showOverflowMenu && root.unpinnedItems.length > 0
+            toggled: root.trayOverflowOpen
+            property bool containsMouse: hovered
 
-			onClicked: root.trayOverflowOpen = !root.trayOverflowOpen
+            onClicked: root.trayOverflowOpen = !root.trayOverflowOpen
 
-			Layout.fillHeight: !root.vertical
-			Layout.fillWidth: root.vertical
-			background.implicitHeight: 24
-			background.implicitWidth: 24
-			background.anchors.centerIn: this
-			colBackgroundToggled: 'red'
-			colBackgroundToggledHover: 'red'
-			colRippleToggled: 'red'
+            Layout.fillHeight: !root.vertical
+            Layout.fillWidth: root.vertical
+            background.implicitWidth: 24
+            background.implicitHeight: 24
+            background.anchors.centerIn: this
+            colBackgroundToggled: Appearance.colors.systray.expand
+            colBackgroundToggledHover: Appearance.colors.systray.expandHover
+            colRippleToggled: Appearance.colors.systray.expandRipple
 
-			contentItem: MaterialSymbol {
-				anchors.centerIn: parent
-				iconSize: Appearance.font.pixelSize.lg
-				text: "expand_more"
-				horizontalAlignment: Text.AlignHCenter
-				color: root.trayOverflowOpen ? 'red' : 'green'
-				rotation: (root.trayOverflowOpen ? 180 : 0) - (90 * root.vertical) + (180 * root.invertSide)
-				Behavior on rotation {
-					animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
-				}
-			}
+            contentItem: MaterialSymbol {
+                anchors.centerIn: parent
+                iconSize: Appearance.font.pixelSize.larger
+                text: "expand_more"
+                horizontalAlignment: Text.AlignHCenter
+                color: root.trayOverflowOpen ? Appearance.colors.systray.expandIcon : Appearance.colors.systray.expandIconOpen
+                rotation: (root.trayOverflowOpen ? 180 : 0) - (90 * root.vertical) + (180 * root.invertSide)
+                Behavior on rotation {
+                    animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
+                }
+            }
 
-			StyledPopup {
-				id: overflowPopup
-				hoverTarget: trayOverflowButton
-				active: root.trayOverflowOpen
-				popupBackgroundMargin: 300
+            StyledPopup {
+                id: overflowPopup
+                hoverTarget: trayOverflowButton
+                active: root.trayOverflowOpen
+                popupBackgroundMargin: 300 // This should be plenty... makes sure tooltips don't get cutoff (easily)
 
-				GridLayout {
-					id: trayOverflowLayout
-					anchors.centerIn: parent
-					columns: Math.ceil(Math.sqrt(root.unpinnedItems.length))
-					columnSpacing: 10
-					rowSpacing: 10
+                GridLayout {
+                    id: trayOverflowLayout
+                    anchors.centerIn: parent
+                    columns: Math.ceil(Math.sqrt(root.unpinnedItems.length))
+                    columnSpacing: 10
+                    rowSpacing: 10
 
-					Repeater {
-						model: root.unpinnedItems
+                    Repeater {
+                        model: root.unpinnedItems
 
-						delegate: SysTrayItem {
-							required property SystemTrayItem modelData
-							item: modelData
-							Layout.fillHeight: !root.vertical
-							Layout.fillWidth: root.vertical
-							onMenuClosed: root.releaseFocus();
-							onMenuOpened: (qsWindow) => root.setExtraWindowAndGrabFocus(qsWindow);
-						}
-					}
-				}
-			}
-		}
-		
-		Repeater {
-			model: ScriptModel {
-				values: root.pinnedItems
-			}
+                        delegate: SysTrayItem {
+                            required property SystemTrayItem modelData
+                            item: modelData
+                            Layout.fillHeight: !root.vertical
+                            Layout.fillWidth: root.vertical
+                            onMenuClosed: root.releaseFocus();
+                            onMenuOpened: (qsWindow) => root.setExtraWindowAndGrabFocus(qsWindow);
+                        }
+                    }
+                }
+            }
+        }
 
-			delegate: SysTrayItem {
-				required property SystemTrayItem modelData
-				item: modelData
-				Layout.fillHeight: !root.vertical
-				Layout.fillWidth: root.vertical
-				onMenuClosed: root.releaseFocus()
-				onMenuOpened: (qsWindow) => {
-					root.setExtraWindowAndGrabFocus(qsWindow);
-				}
-			}
-		}
+        Repeater {
+            model: ScriptModel {
+                values: root.pinnedItems
+            }
 
-		StyledText {
-			Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-			font.pixelSize: Appearance.font.pixelSize.lg
-			color: Appearance.colors.systray.separator
-			text: "•"
-			visible: root.showSeparator && SystemTray.items.values.length > 0
-		}
-	}
+            delegate: SysTrayItem {
+                required property SystemTrayItem modelData
+                item: modelData
+                Layout.fillHeight: !root.vertical
+                Layout.fillWidth: root.vertical
+                onMenuClosed: root.releaseFocus();
+                onMenuOpened: (qsWindow) => {
+                    root.setExtraWindowAndGrabFocus(qsWindow);
+                }
+            }
+        }
+
+        StyledText {
+            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+            font.pixelSize: Appearance.font.pixelSize.larger
+            color: Appearance.colors.systray.separator
+            text: "•"
+            visible: root.showSeparator && SystemTray.items.values.length > 0
+        }
+    }
 }

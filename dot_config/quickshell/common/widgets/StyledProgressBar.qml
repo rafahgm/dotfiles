@@ -8,14 +8,17 @@ import Quickshell
 import Quickshell.Widgets
 import Qt5Compat.GraphicalEffects
 
+/**
+ * Material 3 progress bar. See https://m3.material.io/components/progress-indicators/overview
+ */
 ProgressBar {
     id: root
     property real valueBarWidth: 120
     property real valueBarHeight: 4
     property real valueBarGap: 4
-    property color highlightColor: "black"
-    property color trackColor: "pink"
-    property bool sperm: true
+    property color highlightColor: Appearance?.colors.colPrimary ?? "#685496"
+    property color trackColor: Appearance?.m3colors.m3secondaryContainer ?? "#F1D3F9"
+    property bool sperm: true // If true, the progress bar will have a wavy fill effect
     property bool animateSperm: true
     property real spermAmplitudeMultiplier: sperm ? 0.5 : 0
     property real spermFrequency: 6
@@ -28,7 +31,7 @@ ProgressBar {
     Behavior on value {
         animation: Appearance?.animation.elementMoveEnter.numberAnimation.createObject(this)
     }
-
+    
     background: Item {
         implicitHeight: valueBarHeight
         implicitWidth: valueBarWidth
@@ -36,6 +39,7 @@ ProgressBar {
 
     contentItem: Item {
         anchors.fill: parent
+
         Canvas {
             id: wavyFill
             anchors {
@@ -59,20 +63,19 @@ ProgressBar {
                 ctx.lineWidth = parent.height;
                 ctx.lineCap = "round";
                 ctx.beginPath();
-                for(var x = ctx.lineWidth / 2; x <= fillWidth; x += 1) {
+                for (var x = ctx.lineWidth / 2; x <= fillWidth; x += 1) {
                     var waveY = centerY + amplitude * Math.sin(frequency * 2 * Math.PI * x / width + phase);
-                    if(x === 0) {
+                    if (x === 0)
                         ctx.moveTo(x, waveY);
-                    }else {
+                    else
                         ctx.lineTo(x, waveY);
-                    }
                 }
                 ctx.stroke();
             }
             Connections {
                 target: root
-                function onValueChanged() {wavyFill.requestPaint();}
-                function onHighlightColorChanged() {wavyFill.requestPaint();}
+                function onValueChanged() { wavyFill.requestPaint(); }
+                function onHighlightColorChanged() { wavyFill.requestPaint(); }
             }
             Timer {
                 interval: 1000 / root.spermFps
@@ -81,19 +84,18 @@ ProgressBar {
                 onTriggered: wavyFill.requestPaint()
             }
         }
-
-        Rectangle {
+        Rectangle { // Right remaining part fill
             anchors.right: parent.right
-            width: (1-root.visualPosition) * parent.width - valueBarGap
+            width: (1 - root.visualPosition) * parent.width - valueBarGap
             height: parent.height
-            radius: Appearance.rounding.full
+            radius: Appearance?.rounding.full ?? 9999
             color: root.trackColor
         }
-        Rectangle {
+        Rectangle { // Stop point
             anchors.right: parent.right
             width: valueBarGap
             height: valueBarGap
-            radius: Appearance.rounding.full
+            radius: Appearance?.rounding.full ?? 9999
             color: root.highlightColor
         }
     }

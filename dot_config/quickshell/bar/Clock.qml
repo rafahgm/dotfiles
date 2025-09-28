@@ -18,22 +18,22 @@ Item {
     spacing: 4
 
     StyledText {
-      font.pixelSize: Appearance.font.pixelSize.lg
-      color: Appearance.colors.clockText
+      font.pixelSize: Appearance.font.pixelSize.large
+      color: Appearance.colors.clock.text
       text: DateTime.time
     }
 
     StyledText {
       visible: root.showDate
-      font.pixelSize: Appearance.font.pixelSize.sm
-      color: Appearance.colors.clockText
+      font.pixelSize: Appearance.font.pixelSize.small
+      color: Appearance.colors.clock.text
       text: "•"
     }
 
     StyledText {
       visible: root.showDate
-      font.pixelSize: Appearance.font.pixelSize.lg
-      color: Appearance.colors.clockText
+      font.pixelSize: Appearance.font.pixelSize.small
+      color: Appearance.colors.clock.text
       text: DateTime.date
     }
   }
@@ -43,5 +43,9 @@ Item {
     anchors.fill: parent
     hoverEnabled: true
     acceptedButtons: Qt.NoButton
+
+    ClockTooltip {
+      hoverTarget: mouseArea
+    }
   }
 }
