@@ -1,0 +1,13 @@
+[Unit]
+Description=Data provider service for application launchers
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/elephant
+Restart=on-failure
+RestartSec=1s
+
+[Install]
+WantedBy=graphical-session.target
