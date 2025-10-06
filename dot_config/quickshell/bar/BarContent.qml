@@ -62,10 +62,10 @@ Item {
             Layout.preferredWidth: root.centerSideModuleWidth
             Layout.fillHeight: false
 
-            Media {
-                visible: root.useShortenedForm < 2
-                Layout.fillWidth: true
-            }
+            //Media {
+            //    visible: root.useShortenedForm < 2
+            //    Layout.fillWidth: true
+            //}
         }
 
         BarGroup {
